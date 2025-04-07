@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Manager</title>
+  <style>
+    :root {
+      --green: #27ae60;
+      --beige: #f5f5dc;
+      --white: #ffffff;
+      --black: #000000;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: var(--beige);
+      font-size: 14px;
+      color: var(--black);
+    }
+    .container {
+      max-width: 100%;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+    }
+    .header-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .net-worth {
+      background: var(--white);
+      color: var(--green);
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      flex: 1;
+      max-width: 200px;
+    }
+    .negative {
+      color: #e74c3c;
+    }
+    .tabs {
+      display: flex;
+      flex: 2;
+      gap: 5px;
+    }
+    .tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      background: var(--white);
+      border: 1px solid var(--green);
+      color: var(--green);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      border-radius: 4px;
+    }
+    .tab.active {
+      background: var(--green);
+      color: var(--white);
+    }
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+    .form-container {
+      background: var(--white);
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    button {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: opacity 0.3s;
+      width: auto;
+    }
+    button.delete {
+      background: var(--black);
+    }
+    .list {
+      background: var(--white);
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    .item {
+      padding: 10px;
+      border-bottom: 1px solid var(--beige);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .actions button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 0.8em;
+    }
+    .filter-section {
+      background: var(--white);
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    /* I bottoni nella sezione filtri si adattano automaticamente al contenuto */
+    .filter-section button {
+      width: auto;
+      flex: none;
+      margin: 0;
+    }
+    .summary-card {
+      background: var(--white);
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .summary-item {
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      background: rgba(39, 174, 96, 0.1);
+    }
+    @media (min-width: 768px) {
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-section">
+      <div class="net-worth" id="netWorth">€0.00</div>
+      <div class="tabs">
+        <button class="tab active" data-tab="transactions">Transazioni</button>
+        <button class="tab" data-tab="accounts">Conti</button>
+      </div>
+    </div>
+
+    <!-- Transazioni Tab -->
+    <div id="transactionsTab" class="tab-content active">
+      <div class="filter-section">
+        <input type="date" id="startDate">
+        <input type="date" id="endDate">
+        <button onclick="applyDateFilter()">Applica Filtro</button>
+        <button onclick="clearFilter()" class="delete">Cancella Filtro</button>
+      </div>
+
+      <div class="summary-card" id="summaryCard">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <small>Entrate</small>
+            <div id="periodIncome" class="positive">€0.00</div>
+          </div>
+          <div class="summary-item">
+            <small>Uscite</small>
+            <div id="periodExpense" class="negative">€0.00</div>
+          </div>
+          <div class="summary-item" style="grid-column: span 2">
+            <small>Saldo Periodo</small>
+            <div id="periodNet">€0.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="list" id="transactionList"></div>
+      
+      <div class="form-container">
+        <form id="transactionForm">
+          <input type="date" id="transactionDate" required>
+          <select id="transactionType" required>
+            <option value="income">Entrata</option>
+            <option value="expense">Uscita</option>
+          </select>
+          <select id="transactionAccount" required></select>
+          <input type="number" step="0.01" id="transactionAmount" placeholder="Importo" required pattern="[0-9]+([\.,][0-9]+)?">
+          <input type="text" id="transactionCategory" placeholder="Categoria" required>
+          <button type="submit">Aggiungi Transazione</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Conti Tab -->
+    <div id="accountsTab" class="tab-content">
+      <div class="list" id="accountList"></div>
+      <div class="form-container">
+        <form id="accountForm">
+          <input type="text" id="accountName" placeholder="Nome Conto" required>
+          <input type="number" step="0.01" id="initialBalance" placeholder="Saldo Iniziale" required>
+          <button type="submit">Crea Conto</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Recupero i dati da localStorage oppure inizializzo i valori di default
+    let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let currentFilter = JSON.parse(localStorage.getItem('currentFilter')) || { start: null, end: null, active: false };
+    let accountCounter = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
+    let activeTab = localStorage.getItem('activeTab') || 'transactions';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Se esiste un filtro salvato, lo segnalo come attivo
+      if(currentFilter.start || currentFilter.end){
+        currentFilter.active = true;
+      }
+      showTab(activeTab);
+      document.getElementById('startDate').value = currentFilter.start;
+      document.getElementById('endDate').value = currentFilter.end;
+    });
+
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        localStorage.setItem('activeTab', tabName);
+        showTab(tabName);
+      });
+    });
+
+    function showTab(tabName) {
+      document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(`${tabName}Tab`).classList.add('active');
+      updateUI();
+    }
+
+    function saveData() {
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      localStorage.setItem('currentFilter', JSON.stringify(currentFilter));
+      updateUI();
+    }
+
+    function formatDate(dateString) {
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    function updateUI() {
+      const accountList = document.getElementById('accountList');
+      const accountSelect = document.getElementById('transactionAccount');
+      const transactionList = document.getElementById('transactionList');
+      const summaryCard = document.getElementById('summaryCard');
+
+      accountList.innerHTML = '';
+      accountSelect.innerHTML = '';
+      transactionList.innerHTML = '';
+      summaryCard.style.display = currentFilter.active ? 'block' : 'none';
+
+      const netWorth = accounts.reduce((sum, account) => sum + account.balance, 0);
+      const netWorthElement = document.getElementById('netWorth');
+      netWorthElement.textContent = `€${netWorth.toFixed(2)}`;
+      netWorthElement.className = `net-worth ${netWorth >= 0 ? '' : 'negative'}`;
+
+      const filteredTransactions = currentFilter.active ? 
+        transactions.filter(t => {
+          const tDate = new Date(t.date);
+          return (!currentFilter.start || tDate >= new Date(currentFilter.start)) &&
+                 (!currentFilter.end || tDate <= new Date(currentFilter.end));
+        }) : 
+        transactions;
+
+      if(currentFilter.active) {
+        const periodIncome = filteredTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const periodExpense = filteredTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+        document.getElementById('periodIncome').textContent = `€${periodIncome.toFixed(2)}`;
+        document.getElementById('periodExpense').textContent = `€${periodExpense.toFixed(2)}`;
+        const periodNet = periodIncome - periodExpense;
+        document.getElementById('periodNet').textContent = `€${periodNet.toFixed(2)}`;
+        document.getElementById('periodNet').className = periodNet >= 0 ? 'positive' : 'negative';
+      }
+
+      accounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = account.name;
+        accountSelect.appendChild(option);
+
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div>
+            <h3>${account.name}</h3>
+            <p class="${account.balance >= 0 ? 'positive' : 'negative'}">
+              Saldo ${currentFilter.active ? 'Periodo' : 'Attuale'}: €${account.balance.toFixed(2)}
+            </p>
+            <p>Saldo iniziale: €${account.initialBalance.toFixed(2)}</p>
+          </div>
+          <div class="actions">
+            <button onclick="editAccount(${account.id})">✏️</button>
+            <button class="delete" onclick="deleteAccount(${account.id})">🗑️</button>
+          </div>
+        `;
+        accountList.appendChild(div);
+      });
+
+      filteredTransactions.forEach((transaction, index) => {
+        const account = accounts.find(a => a.id === transaction.accountId);
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div>
+            <h3 class="${transaction.type === 'income' ? 'positive' : 'negative'}">
+              ${transaction.category} (${transaction.type === 'income' ? '+' : '-'}€${transaction.amount.toFixed(2)})
+            </h3>
+            <p>${formatDate(transaction.date)} - ${account?.name || 'Conto Eliminato'}</p>
+          </div>
+          <div class="actions">
+            <button onclick="editTransaction(${index})">✏️</button>
+            <button class="delete" onclick="deleteTransaction(${index})">🗑️</button>
+          </div>
+        `;
+        transactionList.appendChild(div);
+      });
+    }
+
+    document.getElementById('accountForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const newAccount = {
+        id: accountCounter++,
+        name: document.getElementById('accountName').value,
+        balance: parseFloat(document.getElementById('initialBalance').value),
+        initialBalance: parseFloat(document.getElementById('initialBalance').value)
+      };
+      accounts.push(newAccount);
+      saveData();
+      e.target.reset();
+    });
+
+    document.getElementById('transactionForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const accountId = parseInt(document.getElementById('transactionAccount').value);
+      const account = accounts.find(a => a.id === accountId);
+      
+      if(!account) {
+        alert('Seleziona un conto valido!');
+        return;
+      }
+
+      const newTransaction = {
+        date: document.getElementById('transactionDate').value,
+        type: document.getElementById('transactionType').value,
+        accountId: accountId,
+        amount: parseFloat(document.getElementById('transactionAmount').value),
+        category: document.getElementById('transactionCategory').value
+      };
+
+      account.balance += newTransaction.type === 'income' ? newTransaction.amount : -newTransaction.amount;
+      transactions.push(newTransaction);
+      saveData();
+      e.target.reset();
+    });
+
+    function editAccount(accountId) {
+      const account = accounts.find(a => a.id === accountId);
+      const newName = prompt('Nuovo nome conto:', account.name);
+      const newBalance = prompt('Nuovo saldo iniziale:', account.initialBalance);
+      
+      if(newName && newBalance) {
+        const balanceDiff = parseFloat(newBalance) - account.initialBalance;
+        account.name = newName;
+        account.initialBalance = parseFloat(newBalance);
+        account.balance += balanceDiff;
+        saveData();
+      }
+    }
+
+    function deleteAccount(accountId) {
+      if(confirm('Eliminare questo conto e tutte le sue transazioni?')) {
+        accounts = accounts.filter(a => a.id !== accountId);
+        transactions = transactions.filter(t => t.accountId !== accountId);
+        saveData();
+      }
+    }
+
+    function editTransaction(index) {
+      const oldTransaction = transactions[index];
+      const oldAccount = accounts.find(a => a.id === oldTransaction.accountId);
+      const oldAmount = oldTransaction.amount * (oldTransaction.type === 'income' ? 1 : -1);
+      
+      if(oldAccount) oldAccount.balance += oldAmount;
+      
+      const newDate = prompt('Nuova data (AAAA-MM-GG):', oldTransaction.date);
+      const newType = prompt('Nuovo tipo (income/expense):', oldTransaction.type);
+      const newAccountId = prompt('Nuovo conto (ID):', oldTransaction.accountId);
+      const newAmount = prompt('Nuovo importo:', oldTransaction.amount);
+      const newCategory = prompt('Nuova categoria:', oldTransaction.category);
+
+      if(newDate && newType && newAccountId && newAmount && newCategory) {
+        const newAccount = accounts.find(a => a.id === parseInt(newAccountId));
+        if(!newAccount) {
+          alert('Conto non valido!');
+          return;
+        }
+
+        transactions[index] = {
+          date: newDate,
+          type: newType,
+          accountId: parseInt(newAccountId),
+          amount: parseFloat(newAmount),
+          category: newCategory
+        };
+
+        const amountDiff = newType === 'income' ? parseFloat(newAmount) : -parseFloat(newAmount);
+        newAccount.balance += amountDiff;
+        saveData();
+      }
+    }
+
+    function deleteTransaction(index) {
+      if(confirm('Eliminare questa transazione?')) {
+        const transaction = transactions[index];
+        const account = accounts.find(a => a.id === transaction.accountId);
+        if(account) {
+          const amount = transaction.amount * (transaction.type === 'income' ? -1 : 1);
+          account.balance += amount;
+        }
+        transactions.splice(index, 1);
+        saveData();
+      }
+    }
+
+    function applyDateFilter() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      if(startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        alert("La data fine non può essere precedente alla data inizio!");
+        return;
+      }
+      currentFilter.start = startDate;
+      currentFilter.end = endDate;
+      currentFilter.active = Boolean(startDate || endDate);
+      saveData();
+    }
+
+    function clearFilter() {
+      currentFilter = { start: null, end: null, active: false };
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      saveData();
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
