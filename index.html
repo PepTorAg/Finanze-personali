@@ -1,354 +1,539 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Manager</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --light: #ecf0f1;
-            --danger: #e74c3c;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui;
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f5f6fa;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-
-        button:hover {
-            opacity: 0.9;
-        }
-
-        .transaction-list {
-            margin-top: 20px;
-        }
-
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px;
-            margin: 5px 0;
-            background: var(--light);
-            border-radius: 5px;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
-        }
-
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .card {
-                padding: 15px;
-            }
-        }
-
-        input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(0.5);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Manager</title>
+  <style>
+    :root {
+      --green: #27ae60;
+      --beige: #f5f5dc;
+      --white: #ffffff;
+      --black: #000000;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    body {
+      background: var(--beige);
+      font-size: 14px;
+      color: var(--black);
+    }
+    .container {
+      max-width: 100%;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 100vh;
+    }
+    .header-section {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .net-worth {
+      background: var(--white);
+      color: var(--green);
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      flex: 1;
+      max-width: 200px;
+    }
+    .negative {
+      color: #e74c3c;
+    }
+    .tabs {
+      display: flex;
+      flex: 2;
+      gap: 5px;
+    }
+    .tab {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      background: var(--white);
+      border: 1px solid var(--green);
+      color: var(--green);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      border-radius: 4px;
+    }
+    .tab.active {
+      background: var(--green);
+      color: var(--white);
+    }
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .tab-content.active {
+      display: flex;
+    }
+    .form-container {
+      background: var(--white);
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    button {
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+      padding: 8px 12px;
+      transition: opacity 0.3s;
+      width: auto;
+    }
+    button.delete {
+      background: var(--black);
+    }
+    .list {
+      background: var(--white);
+      border-radius: 5px;
+      padding: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    .item {
+      padding: 10px;
+      border-bottom: 1px solid var(--beige);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .actions button {
+      margin-left: 5px;
+      padding: 4px 8px;
+      font-size: 0.8em;
+    }
+    .filter-section {
+      background: var(--white);
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    /* I bottoni nella sezione filtri si adattano automaticamente al contenuto */
+    .filter-section button {
+      width: auto;
+      flex: none;
+      margin: 0;
+    }
+    .summary-card {
+      background: var(--white);
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .summary-item {
+      text-align: center;
+      padding: 10px;
+      border-radius: 5px;
+      background: rgba(39, 174, 96, 0.1);
+    }
+    @media (min-width: 768px) {
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h2>Gestione Conti</h2>
-            <div class="form-group">
-                <input type="text" id="accountName" placeholder="Nome Conto" required>
-                <input type="number" step="0.01" id="initialBalance" placeholder="Saldo Iniziale" required>
-                <button onclick="addAccount()">Crea Conto</button>
-            </div>
-        </div>
-
-        <div class="grid">
-            <div class="card">
-                <h2>Nuova Transazione</h2>
-                <div class="form-group">
-                    <select id="transactionType" required>
-                        <option value="" disabled selected>Seleziona tipo</option>
-                        <option value="income">Entrata</option>
-                        <option value="expense">Uscita</option>
-                    </select>
-                    <input type="number" step="0.01" id="transactionAmount" 
-                           placeholder="Importo" required
-                           oninput="validateNumber(this)">
-                    <input type="date" id="transactionDate" required>
-                    <select id="transactionAccount" required>
-                        <option value="" disabled selected>Seleziona Conto</option>
-                    </select>
-                    <button onclick="addTransaction()">Aggiungi Transazione</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h2>Lista Conti</h2>
-                <div id="accountsList"></div>
-            </div>
-        </div>
-
-        <div class="card transaction-list" id="transactionsSection">
-            <h2>Transazioni Recenti</h2>
-            <div id="transactionsList"></div>
-        </div>
+  <div class="container">
+    <div class="header-section">
+      <div class="net-worth" id="netWorth">€0.00</div>
+      <div class="tabs">
+        <button class="tab active" data-tab="transactions">Transazioni</button>
+        <button class="tab" data-tab="accounts">Conti</button>
+      </div>
     </div>
 
-    <!-- Modale Modifica Transazione -->
-    <div id="editModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <h3>Modifica Transazione</h3>
-            <select id="editTransactionType" required>
-                <option value="" disabled selected>Seleziona tipo</option>
-                <option value="income">Entrata</option>
-                <option value="expense">Uscita</option>
-            </select>
-            <input type="number" step="0.01" id="editTransactionAmount" required>
-            <input type="date" id="editTransactionDate" required>
-            <button onclick="updateTransaction()">Salva Modifiche</button>
-            <button onclick="closeEditModal()" style="background: var(--danger)">Annulla</button>
+    <!-- Transazioni Tab -->
+    <div id="transactionsTab" class="tab-content active">
+      <div class="filter-section">
+        <input type="date" id="startDate">
+        <input type="date" id="endDate">
+        <button onclick="applyDateFilter()">Applica Filtro</button>
+        <button onclick="clearFilter()" class="delete">Cancella Filtro</button>
+      </div>
+
+      <div class="summary-card" id="summaryCard">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <small>Entrate</small>
+            <div id="periodIncome" class="positive">€0.00</div>
+          </div>
+          <div class="summary-item">
+            <small>Uscite</small>
+            <div id="periodExpense" class="negative">€0.00</div>
+          </div>
+          <div class="summary-item" style="grid-column: span 2">
+            <small>Saldo Periodo</small>
+            <div id="periodNet">€0.00</div>
+          </div>
         </div>
+      </div>
+
+      <div class="list" id="transactionList"></div>
+      
+      <div class="form-container">
+        <form id="transactionForm">
+          <input type="date" id="transactionDate" required>
+          <select id="transactionType" required>
+            <option value="" disabled selected>Seleziona Tipo</option>
+            <option value="income">Entrata</option>
+            <option value="expense">Uscita</option>
+          </select>
+          <select id="transactionAccount" required>
+            <option value="" disabled selected>Seleziona Conto</option>
+          </select>
+          <!-- Rimosso l'attributo pattern; type=number garantisce l'inserimento di soli numeri -->
+          <input type="number" step="0.01" id="transactionAmount" placeholder="Importo" required>
+          <input type="text" id="transactionCategory" placeholder="Categoria" required>
+          <button type="submit">Aggiungi Transazione</button>
+        </form>
+      </div>
     </div>
 
-    <script>
-        let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
-        let editingIndex = null;
+    <!-- Conti Tab -->
+    <div id="accountsTab" class="tab-content">
+      <div class="list" id="accountList"></div>
+      <div class="form-container">
+        <form id="accountForm">
+          <input type="text" id="accountName" placeholder="Nome Conto" required>
+          <input type="number" step="0.01" id="initialBalance" placeholder="Saldo Iniziale" required>
+          <button type="submit">Crea Conto</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-        function saveData() {
-            localStorage.setItem('accounts', JSON.stringify(accounts));
-            updateUI();
+  <script>
+    // Recupero i dati da localStorage oppure inizializzo i valori di default
+    let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let currentFilter = JSON.parse(localStorage.getItem('currentFilter')) || { start: null, end: null, active: false };
+    let accountCounter = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
+    let activeTab = localStorage.getItem('activeTab') || 'transactions';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Se esiste un filtro salvato, lo segnalo come attivo
+      if(currentFilter.start || currentFilter.end){
+        currentFilter.active = true;
+      }
+      showTab(activeTab);
+      document.getElementById('startDate').value = currentFilter.start;
+      document.getElementById('endDate').value = currentFilter.end;
+    });
+
+    document.querySelectorAll('[data-tab]').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        localStorage.setItem('activeTab', tabName);
+        showTab(tabName);
+      });
+    });
+
+    function showTab(tabName) {
+      document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      document.getElementById(`${tabName}Tab`).classList.add('active');
+      updateUI();
+    }
+
+    function saveData() {
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+      localStorage.setItem('currentFilter', JSON.stringify(currentFilter));
+      updateUI();
+    }
+
+    // Converte una data dal formato ISO (yyyy-mm-dd) a dd/mm/yyyy
+    function formatDate(dateString) {
+      if(!dateString) return '';
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
+    }
+
+    // Converte una data inserita nel formato dd/mm/aaaa in ISO yyyy-mm-dd; se la stringa è già nel formato ISO la restituisce invariata
+    function parseDate(inputDate) {
+      if(inputDate.indexOf('/') > -1) {
+        const parts = inputDate.split('/');
+        if(parts.length === 3) {
+          return `${parts[2]}-${parts[1]}-${parts[0]}`;
         }
+      }
+      return inputDate;
+    }
 
-        function validateNumber(input) {
-            if(!/^\d*\.?\d*$/.test(input.value)) {
-                input.value = input.value.slice(0, -1);
-            }
+    function updateUI() {
+      const accountList = document.getElementById('accountList');
+      const accountSelect = document.getElementById('transactionAccount');
+      const transactionList = document.getElementById('transactionList');
+      const summaryCard = document.getElementById('summaryCard');
+
+      accountList.innerHTML = '';
+      // Ricreo il placeholder per il select dei conti
+      accountSelect.innerHTML = '<option value="" disabled selected>Seleziona Conto</option>';
+      transactionList.innerHTML = '';
+      summaryCard.style.display = currentFilter.active ? 'block' : 'none';
+
+      const netWorth = accounts.reduce((sum, account) => sum + account.balance, 0);
+      const netWorthElement = document.getElementById('netWorth');
+      netWorthElement.textContent = `€${netWorth.toFixed(2)}`;
+      netWorthElement.className = `net-worth ${netWorth >= 0 ? '' : 'negative'}`;
+
+      const filteredTransactions = currentFilter.active ? 
+        transactions.filter(t => {
+          const tDate = new Date(t.date);
+          return (!currentFilter.start || tDate >= new Date(currentFilter.start)) &&
+                 (!currentFilter.end || tDate <= new Date(currentFilter.end));
+        }) : 
+        transactions;
+
+      if(currentFilter.active) {
+        const periodIncome = filteredTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const periodExpense = filteredTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
+        document.getElementById('periodIncome').textContent = `€${periodIncome.toFixed(2)}`;
+        document.getElementById('periodExpense').textContent = `€${periodExpense.toFixed(2)}`;
+        const periodNet = periodIncome - periodExpense;
+        document.getElementById('periodNet').textContent = `€${periodNet.toFixed(2)}`;
+        document.getElementById('periodNet').className = periodNet >= 0 ? 'positive' : 'negative';
+      }
+
+      accounts.forEach(account => {
+        const option = document.createElement('option');
+        option.value = account.id;
+        option.textContent = account.name;
+        accountSelect.appendChild(option);
+
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div>
+            <h3>${account.name}</h3>
+            <p class="${account.balance >= 0 ? 'positive' : 'negative'}">
+              Saldo ${currentFilter.active ? 'Periodo' : 'Attuale'}: €${account.balance.toFixed(2)}
+            </p>
+            <p>Saldo iniziale: €${account.initialBalance.toFixed(2)}</p>
+          </div>
+          <div class="actions">
+            <button onclick="editAccount(${account.id})">✏️</button>
+            <button class="delete" onclick="deleteAccount(${account.id})">🗑️</button>
+          </div>
+        `;
+        accountList.appendChild(div);
+      });
+
+      filteredTransactions.forEach((transaction, index) => {
+        const account = accounts.find(a => a.id === transaction.accountId);
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div>
+            <h3 class="${transaction.type === 'income' ? 'positive' : 'negative'}">
+              ${transaction.category} (${transaction.type === 'income' ? '+' : '-'}€${transaction.amount.toFixed(2)})
+            </h3>
+            <p>${formatDate(transaction.date)} - ${account?.name || 'Conto Eliminato'}</p>
+          </div>
+          <div class="actions">
+            <button onclick="editTransaction(${index})">✏️</button>
+            <button class="delete" onclick="deleteTransaction(${index})">🗑️</button>
+          </div>
+        `;
+        transactionList.appendChild(div);
+      });
+    }
+
+    // Creazione nuovo conto
+    document.getElementById('accountForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const newAccount = {
+        id: accountCounter++,
+        name: document.getElementById('accountName').value,
+        balance: parseFloat(document.getElementById('initialBalance').value),
+        initialBalance: parseFloat(document.getElementById('initialBalance').value)
+      };
+      accounts.push(newAccount);
+      saveData();
+      e.target.reset();
+    });
+
+    // Creazione nuova transazione – verifica che esista almeno un conto
+    document.getElementById('transactionForm').addEventListener('submit', e => {
+      e.preventDefault();
+      if(accounts.length === 0) {
+        alert('Per favore, crea prima almeno un conto per inserire transazioni.');
+        return;
+      }
+      const accountId = parseInt(document.getElementById('transactionAccount').value);
+      const account = accounts.find(a => a.id === accountId);
+      
+      if(!account) {
+        alert('Seleziona un conto valido!');
+        return;
+      }
+
+      const newTransaction = {
+        date: document.getElementById('transactionDate').value,
+        type: document.getElementById('transactionType').value,
+        accountId: accountId,
+        amount: parseFloat(document.getElementById('transactionAmount').value),
+        category: document.getElementById('transactionCategory').value
+      };
+
+      // Aggiorna il saldo in base al tipo di transazione
+      account.balance += newTransaction.type === 'income' ? newTransaction.amount : -newTransaction.amount;
+      transactions.push(newTransaction);
+      saveData();
+      e.target.reset();
+    });
+
+    function editAccount(accountId) {
+      const account = accounts.find(a => a.id === accountId);
+      const newName = prompt('Nuovo nome conto:', account.name);
+      const newBalance = prompt('Nuovo saldo iniziale:', account.initialBalance);
+      
+      if(newName && newBalance) {
+        const balanceDiff = parseFloat(newBalance) - account.initialBalance;
+        account.name = newName;
+        account.initialBalance = parseFloat(newBalance);
+        account.balance += balanceDiff;
+        saveData();
+      }
+    }
+
+    function deleteAccount(accountId) {
+      if(confirm('Eliminare questo conto e tutte le sue transazioni?')) {
+        accounts = accounts.filter(a => a.id !== accountId);
+        transactions = transactions.filter(t => t.accountId !== accountId);
+        saveData();
+      }
+    }
+
+    function editTransaction(index) {
+      const oldTransaction = transactions[index];
+      const oldAccount = accounts.find(a => a.id === oldTransaction.accountId);
+      // Correggo la logica: per un'entrata rimuovo l'effetto sottraendo l'importo,
+      // per una spesa rimuovo aggiungendo l'importo
+      const oldAmount = oldTransaction.amount * (oldTransaction.type === 'income' ? -1 : 1);
+      if(oldAccount) oldAccount.balance += oldAmount;
+
+      // Richiedo nuovi valori tramite prompt (il formato data richiesto è gg/mm/aaaa)
+      let newDate = prompt('Nuova data (gg/mm/aaaa):', formatDate(oldTransaction.date));
+      let newType = prompt('Nuovo tipo (income/expense):', oldTransaction.type);
+      let newAccountId = prompt('Nuovo conto (ID):', oldTransaction.accountId);
+      let newAmount = prompt('Nuovo importo:', oldTransaction.amount);
+      let newCategory = prompt('Nuova categoria:', oldTransaction.category);
+
+      // Verifica che nessun campo sia nullo o vuoto
+      if(!newDate || !newType || !newAccountId || !newAmount || !newCategory) {
+        alert('Tutti i campi sono obbligatori. La modifica è stata annullata.');
+        // Ripristino l’effetto della vecchia transazione
+        if(oldAccount) oldAccount.balance -= oldAmount;
+        return;
+      }
+
+      // Se la data è inserita nel formato gg/mm/aaaa, convertila in ISO (aaaa-mm-gg)
+      newDate = parseDate(newDate);
+
+      // Controlla che il nuovo conto esista
+      const newAccount = accounts.find(a => a.id === parseInt(newAccountId));
+      if(!newAccount) {
+        alert('Conto non valido!');
+        // Ripristino l’effetto della vecchia transazione
+        if(oldAccount) oldAccount.balance -= oldAmount;
+        return;
+      }
+      // Aggiorna la transazione con i nuovi valori
+      transactions[index] = {
+        date: newDate,
+        type: newType,
+        accountId: parseInt(newAccountId),
+        amount: parseFloat(newAmount),
+        category: newCategory
+      };
+
+      // Applica il nuovo effetto sul saldo del nuovo conto
+      const amountEffect = newType === 'income' ? parseFloat(newAmount) : -parseFloat(newAmount);
+      newAccount.balance += amountEffect;
+      saveData();
+    }
+
+    function deleteTransaction(index) {
+      if(confirm('Eliminare questa transazione?')) {
+        const transaction = transactions[index];
+        const account = accounts.find(a => a.id === transaction.accountId);
+        if(account) {
+          // Inverte l'effetto della transazione
+          const amount = transaction.amount * (transaction.type === 'income' ? -1 : 1);
+          account.balance += amount;
         }
+        transactions.splice(index, 1);
+        saveData();
+      }
+    }
 
-        function addAccount() {
-            const accountName = document.getElementById('accountName').value;
-            const initialBalance = parseFloat(document.getElementById('initialBalance').value);
+    function applyDateFilter() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      if(startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        alert("La data fine non può essere precedente alla data inizio!");
+        return;
+      }
+      currentFilter.start = startDate;
+      currentFilter.end = endDate;
+      currentFilter.active = Boolean(startDate || endDate);
+      saveData();
+    }
 
-            if (!accountName || isNaN(initialBalance)) {
-                alert('Compila tutti i campi correttamente');
-                return;
-            }
+    function clearFilter() {
+      currentFilter = { start: null, end: null, active: false };
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      saveData();
+    }
 
-            accounts.push({
-                name: accountName,
-                initialBalance: initialBalance,
-                currentBalance: initialBalance,
-                transactions: []
-            });
-
-            saveData();
-        }
-
-        function addTransaction() {
-            if (accounts.length === 0) {
-                alert('Crea almeno un conto prima di aggiungere transazioni!');
-                return;
-            }
-
-            const type = document.getElementById('transactionType').value;
-            const amount = parseFloat(document.getElementById('transactionAmount').value);
-            const date = document.getElementById('transactionDate').value;
-            const accountIndex = document.getElementById('transactionAccount').value;
-
-            if (!type || !amount || !date || !accountIndex) {
-                alert('Compila tutti i campi obbligatori');
-                return;
-            }
-
-            const account = accounts[accountIndex];
-            account.transactions.push({
-                type,
-                amount,
-                date: formatDisplayDate(date),
-                timestamp: new Date(date).getTime()
-            });
-
-            account.currentBalance += type === 'income' ? amount : -amount;
-            saveData();
-        }
-
-        function editTransaction(accountIndex, transactionIndex) {
-            const account = accounts[accountIndex];
-            const transaction = account.transactions[transactionIndex];
-
-            document.getElementById('editTransactionType').value = transaction.type;
-            document.getElementById('editTransactionAmount').value = transaction.amount;
-            document.getElementById('editTransactionDate').value = formatDateInput(transaction.date);
-            
-            editingIndex = { accountIndex, transactionIndex };
-            document.getElementById('editModal').style.display = 'block';
-        }
-
-        function updateTransaction() {
-            const { accountIndex, transactionIndex } = editingIndex;
-            const account = accounts[accountIndex];
-            const transaction = account.transactions[transactionIndex];
-            
-            const newType = document.getElementById('editTransactionType').value;
-            const newAmount = parseFloat(document.getElementById('editTransactionAmount').value);
-            const newDateInput = document.getElementById('editTransactionDate').value;
-
-            if (!newType || isNaN(newAmount) || !newDateInput) {
-                alert('Compila tutti i campi correttamente!');
-                return;
-            }
-
-            // Conversione data
-            const [year, month, day] = newDateInput.split('-');
-            const formattedDate = `${day}/${month}/${year}`;
-
-            // Aggiornamento saldo
-            account.currentBalance -= transaction.type === 'income' ? transaction.amount : -transaction.amount;
-            account.currentBalance += newType === 'income' ? newAmount : -newAmount;
-
-            // Aggiornamento transazione
-            transaction.type = newType;
-            transaction.amount = newAmount;
-            transaction.date = formattedDate;
-            transaction.timestamp = new Date(newDateInput).getTime();
-
-            saveData();
-            closeEditModal();
-        }
-
-        function deleteTransaction(accountIndex, transactionIndex) {
-            const account = accounts[accountIndex];
-            
-            let newBalance = account.initialBalance;
-            account.transactions.forEach((t, i) => {
-                if (i !== transactionIndex) {
-                    newBalance += t.type === 'income' ? t.amount : -t.amount;
-                }
-            });
-            account.currentBalance = newBalance;
-            
-            account.transactions.splice(transactionIndex, 1);
-            saveData();
-        }
-
-        function deleteAccount(index) {
-            if(confirm("Sei sicuro di voler eliminare questo conto?")) {
-                accounts.splice(index, 1);
-                saveData();
-            }
-        }
-
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        function formatDisplayDate(dateString) {
-            const [year, month, day] = dateString.split('-');
-            return `${day}/${month}/${year}`;
-        }
-
-        function formatDateInput(displayDate) {
-            const [day, month, year] = displayDate.split('/');
-            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        }
-
-        function updateUI() {
-            const accountsList = document.getElementById('accountsList');
-            accountsList.innerHTML = accounts.map((account, index) => `
-                <div class="card" style="margin: 10px 0">
-                    <h3>${account.name}</h3>
-                    <p>Saldo: €${account.currentBalance.toFixed(2)}</p>
-                    <button onclick="deleteAccount(${index})">Elimina Conto</button>
-                </div>
-            `).join('');
-
-            const accountSelect = document.getElementById('transactionAccount');
-            accountSelect.innerHTML = '<option value="" disabled selected>Seleziona Conto</option>' + 
-                accounts.map((acc, index) => `<option value="${index}">${acc.name}</option>`).join('');
-
-            const transactionsList = document.getElementById('transactionsList');
-            transactionsList.innerHTML = accounts.map((account, accIndex) => 
-                account.transactions.map((t, tIndex) => `
-                    <div class="transaction-item">
-                        <div>
-                            <strong>${account.name}</strong><br>
-                            ${t.date} - ${t.type === 'income' ? '+' : '-'}€${t.amount.toFixed(2)}
-                        </div>
-                        <div>
-                            <button onclick="editTransaction(${accIndex}, ${tIndex})">✏️</button>
-                            <button onclick="deleteTransaction(${accIndex}, ${tIndex})">🗑️</button>
-                        </div>
-                    </div>`
-                ).join('')
-            ).join('');
-        }
-
-        updateUI();
-    </script>
+    updateUI();
+  </script>
 </body>
 </html>
