@@ -81,6 +81,26 @@
             border-radius: 5px;
         }
 
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -89,12 +109,6 @@
             .card {
                 padding: 15px;
             }
-        }
-
-        /* Datepicker normalization */
-        input[type="date"] {
-            -webkit-appearance: none;
-            appearance: none;
         }
 
         input[type="date"]::-webkit-calendar-picker-indicator {
@@ -150,6 +164,7 @@
         <div class="modal-content">
             <h3>Modifica Transazione</h3>
             <select id="editTransactionType" required>
+                <option value="" disabled selected>Seleziona tipo</option>
                 <option value="income">Entrata</option>
                 <option value="expense">Uscita</option>
             </select>
@@ -170,7 +185,9 @@
         }
 
         function validateNumber(input) {
-            input.value = input.value.replace(/[^0-9.]/g, '');
+            if(!/^\d*\.?\d*$/.test(input.value)) {
+                input.value = input.value.slice(0, -1);
+            }
         }
 
         function addAccount() {
@@ -239,22 +256,26 @@
             
             const newType = document.getElementById('editTransactionType').value;
             const newAmount = parseFloat(document.getElementById('editTransactionAmount').value);
-            const newDate = document.getElementById('editTransactionDate').value;
+            const newDateInput = document.getElementById('editTransactionDate').value;
 
-            if (!newType || isNaN(newAmount) || !newDate) {
-                alert('Compila tutti i campi correttamente');
+            if (!newType || isNaN(newAmount) || !newDateInput) {
+                alert('Compila tutti i campi correttamente!');
                 return;
             }
 
-            // Aggiorna saldo
+            // Conversione data
+            const [year, month, day] = newDateInput.split('-');
+            const formattedDate = `${day}/${month}/${year}`;
+
+            // Aggiornamento saldo
             account.currentBalance -= transaction.type === 'income' ? transaction.amount : -transaction.amount;
             account.currentBalance += newType === 'income' ? newAmount : -newAmount;
 
-            // Aggiorna transazione
+            // Aggiornamento transazione
             transaction.type = newType;
             transaction.amount = newAmount;
-            transaction.date = formatDisplayDate(newDate);
-            transaction.timestamp = new Date(newDate).getTime();
+            transaction.date = formattedDate;
+            transaction.timestamp = new Date(newDateInput).getTime();
 
             saveData();
             closeEditModal();
@@ -262,21 +283,30 @@
 
         function deleteTransaction(accountIndex, transactionIndex) {
             const account = accounts[accountIndex];
-            const transaction = account.transactions[transactionIndex];
             
-            // Ricalcola saldo da zero per evitare errori
-            account.currentBalance = account.initialBalance;
+            let newBalance = account.initialBalance;
             account.transactions.forEach((t, i) => {
                 if (i !== transactionIndex) {
-                    account.currentBalance += t.type === 'income' ? t.amount : -t.amount;
+                    newBalance += t.type === 'income' ? t.amount : -t.amount;
                 }
             });
-
+            account.currentBalance = newBalance;
+            
             account.transactions.splice(transactionIndex, 1);
             saveData();
         }
 
-        // Formattazione date
+        function deleteAccount(index) {
+            if(confirm("Sei sicuro di voler eliminare questo conto?")) {
+                accounts.splice(index, 1);
+                saveData();
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
         function formatDisplayDate(dateString) {
             const [year, month, day] = dateString.split('-');
             return `${day}/${month}/${year}`;
@@ -287,9 +317,7 @@
             return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         }
 
-        // UI Updates
         function updateUI() {
-            // Aggiorna lista conti
             const accountsList = document.getElementById('accountsList');
             accountsList.innerHTML = accounts.map((account, index) => `
                 <div class="card" style="margin: 10px 0">
@@ -299,12 +327,10 @@
                 </div>
             `).join('');
 
-            // Aggiorna dropdown conti
             const accountSelect = document.getElementById('transactionAccount');
             accountSelect.innerHTML = '<option value="" disabled selected>Seleziona Conto</option>' + 
                 accounts.map((acc, index) => `<option value="${index}">${acc.name}</option>`).join('');
 
-            // Aggiorna transazioni
             const transactionsList = document.getElementById('transactionsList');
             transactionsList.innerHTML = accounts.map((account, accIndex) => 
                 account.transactions.map((t, tIndex) => `
@@ -322,7 +348,6 @@
             ).join('');
         }
 
-        // Inizializzazione
         updateUI();
     </script>
 </body>
