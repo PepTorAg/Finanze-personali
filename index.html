@@ -137,7 +137,6 @@
       flex-wrap: wrap;
       align-items: center;
     }
-    /* I bottoni nella sezione filtri si adattano automaticamente al contenuto */
     .filter-section button {
       width: auto;
       flex: none;
@@ -218,7 +217,7 @@
           <select id="transactionAccount" required>
             <option value="" disabled selected>Seleziona Conto</option>
           </select>
-          <!-- Rimosso l'attributo pattern; type=number garantisce l'inserimento di soli numeri -->
+          <!-- L'attributo pattern è stato rimosso in quanto non ammesso per input type="number" -->
           <input type="number" step="0.01" id="transactionAmount" placeholder="Importo" required>
           <input type="text" id="transactionCategory" placeholder="Categoria" required>
           <button type="submit">Aggiungi Transazione</button>
@@ -248,7 +247,6 @@
     let activeTab = localStorage.getItem('activeTab') || 'transactions';
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Se esiste un filtro salvato, lo segnalo come attivo
       if(currentFilter.start || currentFilter.end){
         currentFilter.active = true;
       }
@@ -282,14 +280,14 @@
       updateUI();
     }
 
-    // Converte una data dal formato ISO (yyyy-mm-dd) a dd/mm/yyyy
+    // Converte una data ISO (yyyy-mm-dd) in formato dd/mm/yyyy
     function formatDate(dateString) {
       if(!dateString) return '';
       const [year, month, day] = dateString.split('-');
       return `${day}/${month}/${year}`;
     }
 
-    // Converte una data inserita nel formato dd/mm/aaaa in ISO yyyy-mm-dd; se la stringa è già nel formato ISO la restituisce invariata
+    // Converte una data nel formato dd/mm/aaaa in ISO (yyyy-mm-dd); se non è nel formato previsto restituisce la stringa originale
     function parseDate(inputDate) {
       if(inputDate.indexOf('/') > -1) {
         const parts = inputDate.split('/');
@@ -307,12 +305,16 @@
       const summaryCard = document.getElementById('summaryCard');
 
       accountList.innerHTML = '';
-      // Ricreo il placeholder per il select dei conti
+      // Ricrea il placeholder per il select dei conti
       accountSelect.innerHTML = '<option value="" disabled selected>Seleziona Conto</option>';
       transactionList.innerHTML = '';
       summaryCard.style.display = currentFilter.active ? 'block' : 'none';
 
-      const netWorth = accounts.reduce((sum, account) => sum + account.balance, 0);
+      // Calcola il patrimonio netto, ignorando eventuali valori non numerici
+      const netWorth = accounts.reduce((sum, account) => {
+        const balance = parseFloat(account.balance);
+        return sum + (isNaN(balance) ? 0 : balance);
+      }, 0);
       const netWorthElement = document.getElementById('netWorth');
       netWorthElement.textContent = `€${netWorth.toFixed(2)}`;
       netWorthElement.className = `net-worth ${netWorth >= 0 ? '' : 'negative'}`;
@@ -383,21 +385,36 @@
       });
     }
 
-    // Creazione nuovo conto
+    // Form per la creazione di un nuovo conto
     document.getElementById('accountForm').addEventListener('submit', e => {
       e.preventDefault();
+      const accountName = document.getElementById('accountName').value.trim();
+      const initialBalanceInput = document.getElementById('initialBalance').value.trim();
+
+      if(accountName === "" || initialBalanceInput === ""){
+        alert("Completa tutti i campi.");
+        return;
+      }
+
+      const initialBalance = parseFloat(initialBalanceInput);
+      if(isNaN(initialBalance)) {
+        alert("Inserisci un saldo iniziale valido (numero).");
+        return;
+      }
+
       const newAccount = {
         id: accountCounter++,
-        name: document.getElementById('accountName').value,
-        balance: parseFloat(document.getElementById('initialBalance').value),
-        initialBalance: parseFloat(document.getElementById('initialBalance').value)
+        name: accountName,
+        balance: initialBalance,
+        initialBalance: initialBalance
       };
+
       accounts.push(newAccount);
       saveData();
       e.target.reset();
     });
 
-    // Creazione nuova transazione – verifica che esista almeno un conto
+    // Form per l'inserimento di una nuova transazione; verifica che esista almeno un conto
     document.getElementById('transactionForm').addEventListener('submit', e => {
       e.preventDefault();
       if(accounts.length === 0) {
@@ -420,7 +437,6 @@
         category: document.getElementById('transactionCategory').value
       };
 
-      // Aggiorna il saldo in base al tipo di transazione
       account.balance += newTransaction.type === 'income' ? newTransaction.amount : -newTransaction.amount;
       transactions.push(newTransaction);
       saveData();
@@ -452,38 +468,29 @@
     function editTransaction(index) {
       const oldTransaction = transactions[index];
       const oldAccount = accounts.find(a => a.id === oldTransaction.accountId);
-      // Correggo la logica: per un'entrata rimuovo l'effetto sottraendo l'importo,
-      // per una spesa rimuovo aggiungendo l'importo
+      // Rimuovo l'effetto della transazione originale
       const oldAmount = oldTransaction.amount * (oldTransaction.type === 'income' ? -1 : 1);
       if(oldAccount) oldAccount.balance += oldAmount;
 
-      // Richiedo nuovi valori tramite prompt (il formato data richiesto è gg/mm/aaaa)
       let newDate = prompt('Nuova data (gg/mm/aaaa):', formatDate(oldTransaction.date));
       let newType = prompt('Nuovo tipo (income/expense):', oldTransaction.type);
       let newAccountId = prompt('Nuovo conto (ID):', oldTransaction.accountId);
       let newAmount = prompt('Nuovo importo:', oldTransaction.amount);
       let newCategory = prompt('Nuova categoria:', oldTransaction.category);
 
-      // Verifica che nessun campo sia nullo o vuoto
       if(!newDate || !newType || !newAccountId || !newAmount || !newCategory) {
         alert('Tutti i campi sono obbligatori. La modifica è stata annullata.');
-        // Ripristino l’effetto della vecchia transazione
         if(oldAccount) oldAccount.balance -= oldAmount;
         return;
       }
 
-      // Se la data è inserita nel formato gg/mm/aaaa, convertila in ISO (aaaa-mm-gg)
       newDate = parseDate(newDate);
-
-      // Controlla che il nuovo conto esista
       const newAccount = accounts.find(a => a.id === parseInt(newAccountId));
       if(!newAccount) {
         alert('Conto non valido!');
-        // Ripristino l’effetto della vecchia transazione
         if(oldAccount) oldAccount.balance -= oldAmount;
         return;
       }
-      // Aggiorna la transazione con i nuovi valori
       transactions[index] = {
         date: newDate,
         type: newType,
@@ -492,7 +499,6 @@
         category: newCategory
       };
 
-      // Applica il nuovo effetto sul saldo del nuovo conto
       const amountEffect = newType === 'income' ? parseFloat(newAmount) : -parseFloat(newAmount);
       newAccount.balance += amountEffect;
       saveData();
@@ -503,7 +509,6 @@
         const transaction = transactions[index];
         const account = accounts.find(a => a.id === transaction.accountId);
         if(account) {
-          // Inverte l'effetto della transazione
           const amount = transaction.amount * (transaction.type === 'income' ? -1 : 1);
           account.balance += amount;
         }
