@@ -33,6 +33,6 @@
       "type": "image/png"
     }
     // Se vuoi includere anche le icone numeriche (727507, ecc.),
-    // aggiungi qui i relativi oggetti con "src", "sizes" e "type".
+    // aggiungi qui relativi oggetti con "src", "sizes" e "type".
   ]
 }
