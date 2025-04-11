@@ -124,7 +124,7 @@
   let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
   let currentFilter = JSON.parse(localStorage.getItem('currentFilter')) || { start: null, end: null, active: false };
   let accountCounter = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
-  let activeTab = localStorage.getItem('activeTab')) || 'transactions';
+  let activeTab = localStorage.getItem('activeTab') || 'transactions';
 
   document.addEventListener('DOMContentLoaded', () => {
     if(currentFilter.start || currentFilter.end) currentFilter.active = true;
@@ -182,10 +182,6 @@
     return date.toString() === 'Invalid Date' ? null : date.toISOString().split('T')[0];
   }
 
-  // ... (Continua nella prossima sezione) ...
-</script>
-<script>
-  // Continuazione Script
   function updateUI() {
     recalcAccounts();
     const accountList = document.getElementById('accountList');
@@ -276,62 +272,64 @@
     saveData();
     e.target.reset();
   });
-
-  // ... (Continua) ...
-</script>
-<script>
-  // Ultima Parte dello Script
-  document.getElementById('transactionForm').addEventListener('submit', e => {
-    e.preventDefault();
-    if(accounts.length === 0) {
-      alert('Crea prima un conto!');
-      return;
-    }
-    
-    const accountId = parseInt(document.getElementById('transactionAccount').value);
-    const account = accounts.find(a => a.id === accountId);
-    if(!account) {
-      alert('Seleziona un conto valido!');
-      return;
-    }
-
-    transactions.push({
-      date: document.getElementById('transactionDate').value,
-      type: document.getElementById('transactionType').value,
-      accountId: accountId,
-      amount: parseFloat(document.getElementById('transactionAmount').value),
-      category: document.getElementById('transactionCategory').value
-    });
-    
-    recalcAccounts();
-    saveData();
-    e.target.reset();
-  });
-
-  function editAccount(accountId) {
-    const account = accounts.find(a => a.id === accountId);
-    const newName = prompt('Nuovo nome:', account.name);
-    const newBalance = prompt('Nuovo saldo:', account.initialBalance);
-    
-    if(newName && newBalance) {
-      const balanceDiff = parseFloat(newBalance) - account.initialBalance;
-      account.name = newName;
-      account.initialBalance = parseFloat(newBalance);
-      account.balance += balanceDiff;
-      saveData();
-    }
+    document.getElementById('transactionForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if(accounts.length === 0) {
+    alert('Crea prima un conto!');
+    return;
+  }
+  
+  const accountId = parseInt(document.getElementById('transactionAccount').value);
+  const account = accounts.find(a => a.id === accountId);
+  if(!account) {
+    alert('Seleziona un conto valido!');
+    return;
   }
 
-  function deleteAccount(accountId) {
-    if(confirm('Eliminare conto e transazioni?')) {
-      accounts = accounts.filter(a =>
-            function editTransaction(index) {
-      const oldTransaction = transactions[index];
+  transactions.push({
+    date: document.getElementById('transactionDate').value,
+    type: document.getElementById('transactionType').value,
+    accountId: accountId,
+    amount: parseFloat(document.getElementById('transactionAmount').value),
+    category: document.getElementById('transactionCategory').value
+  });
+  
+  recalcAccounts();
+  saveData();
+  e.target.reset();
+});
+
+// Funzioni modifica/eliminazione
+function editAccount(accountId) {
+  const account = accounts.find(a => a.id === accountId);
+  const newName = prompt('Nuovo nome:', account.name);
+  const newBalance = prompt('Nuovo saldo:', account.initialBalance);
+  
+  if(newName && newBalance) {
+    const balanceDiff = parseFloat(newBalance) - account.initialBalance;
+    account.name = newName;
+    account.initialBalance = parseFloat(newBalance);
+    account.balance += balanceDiff;
+    saveData();
+  }
+}
+
+function deleteAccount(accountId) {
+  if(confirm('Eliminare conto e transazioni?')) {
+    accounts = accounts.filter(a => a.id !== accountId);
+    transactions = transactions.filter(t => t.accountId !== accountId);
+    saveData();
+  }
+}
+
+function editTransaction(index) {
+  const oldTransaction =
+          const oldTransaction = transactions[index];
       const newDateInput = prompt('Data (gg/mm/aaaa):', formatDate(oldTransaction.date));
       const isoDate = convertDateDMYToISO(newDateInput);
       
       if(!isoDate) {
-        alert('Formato data non valido!');
+        alert('Formato data non valido! Usa gg/mm/aaaa');
         return;
       }
 
@@ -368,7 +366,7 @@
       const end = document.getElementById('endDate').value;
       
       if(start && end && new Date(end) < new Date(start)) {
-        alert('Data fine precedente alla data inizio!');
+        alert('La data fine non può essere precedente alla data inizio!');
         return;
       }
       
@@ -385,32 +383,59 @@
       saveData();
     }
 
-    // PWA Logic
+    // Logica PWA Aggiornata
     let deferredPrompt;
+    
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
       document.getElementById('installBtn').style.display = 'block';
+      console.log('Evento beforeinstallprompt attivato');
+      
+      // Verifica periodica per Firefox
+      setTimeout(() => {
+        if(!deferredPrompt) {
+          document.getElementById('installBtn').style.display = 'none';
+        }
+      }, 2000);
     });
 
-    document.getElementById('installBtn').addEventListener('click', () => {
+    document.getElementById('installBtn').addEventListener('click', async () => {
       if(deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choice => {
-          if(choice.outcome === 'accepted') console.log('PWA installata');
-          deferredPrompt = null;
-        });
+        try {
+          await deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if(outcome === 'accepted') {
+            console.log('Installazione riuscita');
+            document.getElementById('installBtn').style.display = 'none';
+          }
+        } catch(err) {
+          console.error('Errore installazione:', err);
+          alert('Installa manualmente dal menu del browser');
+        }
+        deferredPrompt = null;
       }
     });
 
-    // Service Worker
+    // Service Worker con Fallback
     if('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/Finanze-personali/sw.js')
-          .then(reg => console.log('SW registrato:', reg.scope))
-          .catch(err => console.error('SW errore:', err));
-      });
+      navigator.serviceWorker.register('/Finanze-personali/sw.js')
+        .then(reg => {
+          console.log('Service Worker registrato:', reg.scope);
+          // Forza l'aggiornamento dello SW ad ogni visita
+          reg.update();
+        })
+        .catch(error => {
+          console.warn('Registrazione SW fallita:', error);
+          document.getElementById('installBtn').style.display = 'block';
+        });
     }
+
+    // Verifica stato offline
+    window.addEventListener('online', updateUI);
+    window.addEventListener('offline', () => {
+      document.getElementById('installBtn').style.display = 'none';
+    });
 
     updateUI();
   </script>
