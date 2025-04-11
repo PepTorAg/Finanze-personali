@@ -232,6 +232,9 @@
   background: #34495e;
 }
 </style>
+  if(/Android|webOS|iPhone|iPad/i.test(navigator.userAgent)) {
+  document.getElementById('installBtn').style.display = 'block';
+}
   <div class="container">
     <div class="header-section">
       <div class="net-worth" id="netWorth">€0.00</div>
