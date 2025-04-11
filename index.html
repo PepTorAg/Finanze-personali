@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+  <!-- PWA Configuration -->
+<meta name="apple-mobile-web-app-title" content="Picciuli">
+<meta name="application-name" content="Picciuli">
+<meta name="theme-color" content="#2c3e50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link rel="manifest" href="/Finanze-personali/icons/manifest.json">
+
+<!-- Touch Icons -->
+<link rel="apple-touch-icon" href="/Finanze-personali/icons/apple-icon-180x180.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/Finanze-personali/icons/icon-512x512.png">
   <!-- Favicon Base -->
 <link rel="icon" href="/Finanze-personali/icons/favicon.ico" type="image/x-icon">
 
@@ -557,6 +569,39 @@
     }
 
     updateUI();
+  </script>
+  <script>
+// Registrazione Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/Finanze-personali/sw.js')
+      .then(registration => {
+        console.log('SW registrato con scope:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Registrazione SW fallita:', error);
+      });
+  });
+}
+
+// Installazione PWA
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostra pulsante installazione (opzionale)
+  document.getElementById('installBtn').style.display = 'block';
+});
+
+document.getElementById('installBtn').addEventListener('click', () => {
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then((choiceResult) => {
+    if (choiceResult.outcome === 'accepted') {
+      console.log('Utente ha accettato l\'installazione');
+    }
+    deferredPrompt = null;
+  });
+});
   </script>
 </body>
 </html> 
