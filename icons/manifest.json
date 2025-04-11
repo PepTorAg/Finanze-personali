@@ -1,6 +1,7 @@
 {
   "name": "Picciuli",
   "short_name": "Picciuli",
+  "description": "Gestione finanze personali",
   "icons": [
     {
       "src": "/Finanze-personali/icons/android-icon-192x192.png",
@@ -8,12 +9,16 @@
       "type": "image/png"
     },
     {
-      "src": "/Finanze-personali/icons/favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png"
+      "src": "/Finanze-personali/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "#ffffff",
+  "start_url": "/Finanze-personali/index.html",
+  "scope": "/Finanze-personali/",
   "background_color": "#ffffff",
-  "display": "standalone"
+  "theme_color": "#2c3e50",
+  "display": "standalone",
+  "orientation": "portrait"
 }
