@@ -237,6 +237,12 @@
   document.getElementById('installBtn').style.display = 'block';
 }
 </script>
+<script>
+  document.getElementById('installBtn').addEventListener('click', () => {
+  // Implementazione esistente
+  analytics.logEvent('pwa_install_attempt'); // Esempio: tracciamento
+});
+</script>
   <div class="container">
     <div class="header-section">
       <div class="net-worth" id="netWorth">€0.00</div>
