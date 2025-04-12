@@ -199,13 +199,44 @@
       border-radius: 5px;
       background: rgba(39, 174, 96, 0.1);
     }
-    @media (min-width: 768px) {
-      .container {
-        max-width: 600px;
-        margin: 0 auto;
-      }
+    
+  @media (min-width: 768px) {
+    body {
+      max-width: 600px;
+      margin: 0 auto;
+      transform-origin: top center;
+      transform: scale(0.9);
     }
-  </style>
+    html {
+      background: var(--beige);
+      overflow-x: hidden;
+    }
+  }
+
+  /* Disabilita lo zoom su iOS */
+  textarea,
+  input,
+  select {
+    font-size: 16px !important;
+  }
+
+  /* Modifica lo stile del pulsante installa */
+  .pwa-install-btn {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    z-index: 1000;
+    font-size: 14px;
+  }
+</style>
 </head>
 <body>
 
