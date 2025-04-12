@@ -642,18 +642,60 @@
     updateUI();
   </script>
   <script>
-// Registrazione Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/Finanze-personali/sw.js')
-      .then(registration => {
-        console.log('SW registrato con scope:', registration.scope);
-      })
-      .catch(error => {
-        console.log('Registrazione SW fallita:', error);
-      });
+  // Registrazione Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/Finanze-personali/sw.js')
+        .then(registration => {
+          console.log('SW registrato con scope:', registration.scope);
+        })
+        .catch(error => {
+          console.log('Registrazione SW fallita:', error);
+        });
+    });
+  }
+
+  // Gestione installazione PWA
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  // Controlla se l'app è già installata
+  const isInstalled = () => 
+    window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone ||
+    document.referrer.includes('android-app://');
+
+  // Mostra/nascondi pulsante
+  if(!isInstalled()) {
+    installBtn.style.display = 'block';
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if(!isInstalled()) {
+      installBtn.style.display = 'block';
+    }
   });
-}
+
+  installBtn.addEventListener('click', () => {
+    if(deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        installBtn.style.display = 'none';
+      });
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    localStorage.setItem('appInstalled', 'true');
+  });
+
+  // Nascondi il pulsante se l'app è già installata
+  if(localStorage.getItem('appInstalled') === 'true' || isInstalled()) {
+    installBtn.style.display = 'none';
+  }
 
 // Installazione PWA
 let deferredPrompt;
