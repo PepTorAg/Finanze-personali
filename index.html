@@ -2,8 +2,6 @@
 <html lang="it">
 <head>
   <!-- PWA Configuration -->
-  <meta name="viewport" 
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-title" content="Picciuli">
 <meta name="application-name" content="Picciuli">
 <meta name="theme-color" content="#2c3e50">
@@ -199,44 +197,12 @@
       border-radius: 5px;
       background: rgba(39, 174, 96, 0.1);
     }
-    
-  @media (min-width: 768px) {
-    body {
-      max-width: 600px;
-      margin: 0 auto;
-      transform-origin: top center;
-      transform: scale(0.9);
+    @media (min-width: 768px) {
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+      }
     }
-    html {
-      background: var(--beige);
-      overflow-x: hidden;
-    }
-  }
-
-  /* Disabilita lo zoom su iOS */
-  textarea,
-  input,
-  select {
-    font-size: 16px !important;
-  }
-
-  /* Modifica lo stile del pulsante installa */
-  .pwa-install-btn {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 12px 24px;
-    background: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 1000;
-    font-size: 14px;
-  }
-    
   </style>
 </head>
 <body>
@@ -642,60 +608,18 @@
     updateUI();
   </script>
   <script>
-  // Registrazione Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/Finanze-personali/sw.js')
-        .then(registration => {
-          console.log('SW registrato con scope:', registration.scope);
-        })
-        .catch(error => {
-          console.log('Registrazione SW fallita:', error);
-        });
-    });
-  }
-
-  // Gestione installazione PWA
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-
-  // Controlla se l'app è già installata
-  const isInstalled = () => 
-    window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone ||
-    document.referrer.includes('android-app://');
-
-  // Mostra/nascondi pulsante
-  if(!isInstalled()) {
-    installBtn.style.display = 'block';
-  }
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if(!isInstalled()) {
-      installBtn.style.display = 'block';
-    }
-  });
-
-  installBtn.addEventListener('click', () => {
-    if(deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(() => {
-        installBtn.style.display = 'none';
+// Registrazione Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/Finanze-personali/sw.js')
+      .then(registration => {
+        console.log('SW registrato con scope:', registration.scope);
+      })
+      .catch(error => {
+        console.log('Registrazione SW fallita:', error);
       });
-    }
   });
-
-  window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
-    localStorage.setItem('appInstalled', 'true');
-  });
-
-  // Nascondi il pulsante se l'app è già installata
-  if(localStorage.getItem('appInstalled') === 'true' || isInstalled()) {
-    installBtn.style.display = 'none';
-  }
+}
 
 // Installazione PWA
 let deferredPrompt;
