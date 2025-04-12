@@ -1,26 +1,46 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" 
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- PWA Configuration -->
   <meta name="apple-mobile-web-app-title" content="Picciuli">
   <meta name="application-name" content="Picciuli">
   <meta name="theme-color" content="#2c3e50">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-  <!-- Icone -->
+
   <link rel="manifest" href="/Finanze-personali/icons/manifest.json">
+
+  <!-- Touch Icons -->
   <link rel="apple-touch-icon" href="/Finanze-personali/icons/apple-icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/Finanze-personali/icons/icon-512x512.png">
+  <!-- Favicon Base -->
   <link rel="icon" href="/Finanze-personali/icons/favicon.ico" type="image/x-icon">
+
+  <!-- Dimensioni standard -->
   <link rel="icon" type="image/png" sizes="32x32" href="/Finanze-personali/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/Finanze-personali/icons/favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/Finanze-personali/icons/android-icon-192x192.png">
-  <meta name="msapplication-TileImage" content="/Finanze-personali/icons/ms-icon-150x150.png">
 
+  <!-- Apple iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/Finanze-personali/icons/apple-icon-180x180.png">
+
+  <!-- Android -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/Finanze-personali/icons/android-icon-192x192.png">
+
+  <!-- Microsoft -->
+  <meta name="msapplication-TileImage" content="/Finanze-personali/icons/ms-icon-150x150.png">
+  <meta name="msapplication-config" content="/Finanze-personali/icons/browserconfig.xml">
+
+  <!-- Web Manifest -->
+  <link rel="manifest" href="/Finanze-personali/icons/manifest.json">
+
+  <!-- Controllo Cache -->
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/Finanze-personali/icons/favicon.ico?v=3">
+  <meta name="msapplication-config" content="/icons/browserconfig.xml">
+  <meta charset="UTF-8">
+  <!-- Per forzare la visualizzazione mobile anche in modalità desktop su smartphone -->
+  <meta name="viewport" content="width=360, initial-scale=1.0">
   <title>Finance Manager</title>
-  
   <style>
     :root {
       --green: #27ae60;
@@ -28,39 +48,17 @@
       --white: #ffffff;
       --black: #000000;
     }
-    
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', sans-serif;
     }
-
     body {
       background: var(--beige);
       font-size: 14px;
       color: var(--black);
     }
-
-    @media (min-width: 768px) {
-      body {
-        max-width: 600px;
-        margin: 0 auto;
-        transform-origin: top center;
-        transform: scale(0.9);
-      }
-      html {
-        background: var(--beige);
-        overflow-x: hidden;
-      }
-    }
-
-    textarea,
-    input,
-    select {
-      font-size: 16px !important;
-    }
-
     .container {
       max-width: 100%;
       padding: 10px;
@@ -69,14 +67,12 @@
       gap: 10px;
       min-height: 100vh;
     }
-
     .header-section {
       display: flex;
       gap: 10px;
       align-items: center;
       margin-bottom: 10px;
     }
-
     .net-worth {
       background: var(--white);
       color: var(--green);
@@ -88,17 +84,14 @@
       flex: 1;
       max-width: 200px;
     }
-
     .negative {
       color: #e74c3c;
     }
-
     .tabs {
       display: flex;
       flex: 2;
       gap: 5px;
     }
-
     .tab {
       flex: 1;
       padding: 8px;
@@ -111,29 +104,24 @@
       font-size: 0.9em;
       border-radius: 4px;
     }
-
     .tab.active {
       background: var(--green);
       color: var(--white);
     }
-
     .tab-content {
       display: none;
       flex-direction: column;
       gap: 10px;
     }
-
     .tab-content.active {
       display: flex;
     }
-
     .form-container {
       background: var(--white);
       padding: 15px;
       border-radius: 5px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-
     input, select, button {
       width: 100%;
       padding: 8px;
@@ -142,7 +130,6 @@
       border-radius: 4px;
       font-size: 0.9em;
     }
-
     button {
       background: var(--green);
       color: var(--white);
@@ -152,11 +139,9 @@
       transition: opacity 0.3s;
       width: auto;
     }
-
     button.delete {
       background: var(--black);
     }
-
     .list {
       background: var(--white);
       border-radius: 5px;
@@ -165,7 +150,6 @@
       max-height: 50vh;
       overflow-y: auto;
     }
-
     .item {
       padding: 10px;
       border-bottom: 1px solid var(--beige);
@@ -173,17 +157,14 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .item:last-child {
       border-bottom: none;
     }
-
     .actions button {
       margin-left: 5px;
       padding: 4px 8px;
       font-size: 0.8em;
     }
-
     .filter-section {
       background: var(--white);
       padding: 10px;
@@ -193,30 +174,56 @@
       flex-wrap: wrap;
       align-items: center;
     }
-
+    /* I bottoni nella sezione filtri si adattano automaticamente al contenuto */
+    .filter-section button {
+      width: auto;
+      flex: none;
+      margin: 0;
+    }
     .summary-card {
       background: var(--white);
       padding: 15px;
       border-radius: 5px;
       display: none;
     }
-
     .summary-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
       margin-top: 10px;
     }
-
     .summary-item {
       text-align: center;
       padding: 10px;
       border-radius: 5px;
       background: rgba(39, 174, 96, 0.1);
     }
+    /* Rimuovendo la media query in modo da non modificare il layout mobile */
+  </style>
+  
+  <script>
+    // Al caricamento della pagina controlliamo se l'app è già installata (modalità standalone) e
+    // in tal caso nascondiamo il pulsante di installazione.
+    document.addEventListener('DOMContentLoaded', () => {
+      const installBtn = document.getElementById('installBtn');
+      if ((window.navigator.standalone === true) || window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn.style.display = 'none';
+      } else {
+        installBtn.style.display = 'block';
+      }
+    });
+  </script>
+</head>
+<body>
+  <!-- Pulsante di installazione: verrà mostrato solo se l'app non è già installata -->
+  <button id="installBtn" class="pwa-install-btn">
+    ⬇️ Installa Picciuli
+  </button>
 
+  <style>
+    /* Stile base per il pulsante PWA */
     .pwa-install-btn {
-      display: none;
+      display: none; /* di default nascosto: verrà gestito via JavaScript */
       position: fixed;
       bottom: 20px;
       right: 20px;
@@ -229,18 +236,12 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       z-index: 1000;
     }
-
     .pwa-install-btn:hover {
       background: #34495e;
     }
   </style>
-</head>
 
-<body>
-  <button id="installBtn" class="pwa-install-btn">
-    ⬇️ Installa Picciuli
-  </button>
-
+  <!-- Codice principale dell'app -->
   <div class="container">
     <div class="header-section">
       <div class="net-worth" id="netWorth">€0.00</div>
@@ -250,7 +251,7 @@
       </div>
     </div>
 
-    <!-- Transazioni Tab -->
+    <!-- Tab Transazioni -->
     <div id="transactionsTab" class="tab-content active">
       <div class="filter-section">
         <input type="date" id="startDate">
@@ -288,6 +289,7 @@
           <select id="transactionAccount" required>
             <option value="" disabled selected hidden>Seleziona Conto</option>
           </select>
+          <!-- Input di tipo number garantisce l'inserimento di soli numeri -->
           <input type="number" step="0.01" id="transactionAmount" placeholder="Importo" required>
           <input type="text" id="transactionCategory" placeholder="Categoria" required>
           <button type="submit">Aggiungi Transazione</button>
@@ -295,7 +297,7 @@
       </div>
     </div>
 
-    <!-- Conti Tab -->
+    <!-- Tab Conti -->
     <div id="accountsTab" class="tab-content">
       <div class="list" id="accountList"></div>
       <div class="form-container">
@@ -308,58 +310,20 @@
     </div>
   </div>
 
+  <!-- Script principale dell'app -->
   <script>
-    // Dati e inizializzazione
+    // Recupero i dati da localStorage oppure inizializzo i valori di default
     let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
     let currentFilter = JSON.parse(localStorage.getItem('currentFilter')) || { start: null, end: null, active: false };
     let accountCounter = accounts.length > 0 ? Math.max(...accounts.map(a => a.id)) + 1 : 1;
-    let activeTab = localStorage.getItem('activeTab')) || 'transactions';
+    let activeTab = localStorage.getItem('activeTab') || 'transactions';
 
-    // Gestione PWA
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-    
-    const isInstalled = () => 
-      window.matchMedia('(display-mode: standalone)').matches || 
-      window.navigator.standalone ||
-      document.referrer.includes('android-app://');
-
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/Finanze-personali/sw.js')
-          .then(registration => console.log('SW registrato:', registration.scope))
-          .catch(error => console.log('SW error:', error));
-      });
-    }
-
-    // Gestione installazione
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      if(!isInstalled()) installBtn.style.display = 'block';
-    });
-
-    installBtn.addEventListener('click', () => {
-      if(deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => installBtn.style.display = 'none');
-      }
-    });
-
-    window.addEventListener('appinstalled', () => {
-      installBtn.style.display = 'none';
-      localStorage.setItem('appInstalled', 'true');
-    });
-
-    if(localStorage.getItem('appInstalled') === 'true' || isInstalled()) {
-      installBtn.style.display = 'none';
-    }
-
-    // Funzioni core
     document.addEventListener('DOMContentLoaded', () => {
-      if(currentFilter.start || currentFilter.end) currentFilter.active = true;
+      // Se esiste un filtro salvato, lo segnalo come attivo
+      if(currentFilter.start || currentFilter.end){
+        currentFilter.active = true;
+      }
       showTab(activeTab);
       document.getElementById('startDate').value = currentFilter.start;
       document.getElementById('endDate').value = currentFilter.end;
@@ -376,16 +340,23 @@
     function showTab(tabName) {
       document.querySelectorAll('[data-tab]').forEach(t => t.classList.remove('active'));
       document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
       document.getElementById(`${tabName}Tab`).classList.add('active');
       updateUI();
     }
 
+    // Ricalcola il saldo di ogni conto ripartendo dal saldo iniziale e applicando tutte le transazioni
     function recalcAccounts() {
-      accounts.forEach(account => account.balance = account.initialBalance);
+      accounts.forEach(account => {
+        account.balance = account.initialBalance;
+      });
       transactions.forEach(transaction => {
         const account = accounts.find(a => a.id === transaction.accountId);
-        if(account) account.balance += transaction.type === 'income' ? transaction.amount : -transaction.amount;
+        if(account) {
+          account.balance += transaction.type === 'income' ? transaction.amount : -transaction.amount;
+        }
       });
     }
 
@@ -396,11 +367,13 @@
       updateUI();
     }
 
+    // Converte data ISO in formato gg/mm/aaaa per la visualizzazione
     function formatDate(dateString) {
       const [year, month, day] = dateString.split('-');
       return `${day}/${month}/${year}`;
     }
 
+    // Converte una data dal formato dd/mm/aaaa al formato ISO (yyyy-mm-dd)
     function convertDateDMYToISO(dmy) {
       const parts = dmy.split('/');
       if(parts.length !== 3) return null;
@@ -409,13 +382,16 @@
     }
 
     function updateUI() {
+      // Ricalcolo i saldi per evitare discrepanze
       recalcAccounts();
+
       const accountList = document.getElementById('accountList');
       const accountSelect = document.getElementById('transactionAccount');
       const transactionList = document.getElementById('transactionList');
       const summaryCard = document.getElementById('summaryCard');
 
       accountList.innerHTML = '';
+      // Ricostruisco il select per le transazioni partendo dal placeholder
       accountSelect.innerHTML = '<option value="" disabled selected hidden>Seleziona Conto</option>';
       transactionList.innerHTML = '';
       summaryCard.style.display = currentFilter.active ? 'block' : 'none';
@@ -434,8 +410,12 @@
         transactions;
 
       if(currentFilter.active) {
-        const periodIncome = filteredTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-        const periodExpense = filteredTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+        const periodIncome = filteredTransactions
+          .filter(t => t.type === 'income')
+          .reduce((sum, t) => sum + t.amount, 0);
+        const periodExpense = filteredTransactions
+          .filter(t => t.type === 'expense')
+          .reduce((sum, t) => sum + t.amount, 0);
         document.getElementById('periodIncome').textContent = `€${periodIncome.toFixed(2)}`;
         document.getElementById('periodExpense').textContent = `€${periodExpense.toFixed(2)}`;
         const periodNet = periodIncome - periodExpense;
@@ -444,6 +424,7 @@
       }
 
       accounts.forEach(account => {
+        // Popolo il select dei conti per il form delle transazioni
         const option = document.createElement('option');
         option.value = account.id;
         option.textContent = account.name;
@@ -496,131 +477,174 @@
         initialBalance: parseFloat(document.getElementById('initialBalance').value)
       };
       accounts.push(newAccount);
-      save
-      Date
-      e.target.reset()
-     });
+      saveData();
+      e.target.reset();
+    });
+
     document.getElementById('transactionForm').addEventListener('submit', e => {
-  e.preventDefault();
-  if(accounts.length === 0) {
-    alert('Crea almeno un conto!');
-    return;
-  }
-  
-  const accountIdValue = document.getElementById('transactionAccount').value;
-  if(!accountIdValue) {
-    alert('Seleziona un conto!');
-    return;
-  }
-  const accountId = parseInt(accountIdValue);
-  const account = accounts.find(a => a.id === accountId);
-  if(!account) {
-    alert('Conto non valido!');
-    return;
-  }
+      e.preventDefault();
+      // Se non esiste alcun conto, blocco l'inserimento e avverto l'utente
+      if(accounts.length === 0) {
+        alert('Per inserire transazioni è necessario creare almeno un conto!');
+        return;
+      }
+      
+      // Verifico che l'utente abbia selezionato un conto valido
+      const accountIdValue = document.getElementById('transactionAccount').value;
+      if(!accountIdValue) {
+        alert('Seleziona un conto valido!');
+        return;
+      }
+      const accountId = parseInt(accountIdValue);
+      const account = accounts.find(a => a.id === accountId);
+      if(!account) {
+        alert('Conto non valido!');
+        return;
+      }
 
-  const newTransaction = {
-    date: document.getElementById('transactionDate').value,
-    type: document.getElementById('transactionType').value,
-    accountId: accountId,
-    amount: parseFloat(document.getElementById('transactionAmount').value),
-    category: document.getElementById('transactionCategory').value
-  };
+      const newTransaction = {
+        date: document.getElementById('transactionDate').value,
+        type: document.getElementById('transactionType').value,
+        accountId: accountId,
+        amount: parseFloat(document.getElementById('transactionAmount').value),
+        category: document.getElementById('transactionCategory').value
+      };
 
-  transactions.push(newTransaction);
-  recalcAccounts();
-  saveData();
-  e.target.reset();
-});
+      transactions.push(newTransaction);
+      // Ricalcolo i saldi dopo l'inserimento
+      recalcAccounts();
+      saveData();
+      e.target.reset();
+    });
 
-function editAccount(accountId) {
-  const account = accounts.find(a => a.id === accountId);
-  const newName = prompt('Nuovo nome:', account.name);
-  const newBalance = prompt('Nuovo saldo:', account.initialBalance);
-  
-  if(newName && newBalance) {
-    const balanceDiff = parseFloat(newBalance) - account.initialBalance;
-    account.name = newName;
-    account.initialBalance = parseFloat(newBalance);
-    account.balance += balanceDiff;
-    saveData();
-  }
-}
+    function editAccount(accountId) {
+      const account = accounts.find(a => a.id === accountId);
+      const newName = prompt('Nuovo nome conto:', account.name);
+      const newBalance = prompt('Nuovo saldo iniziale:', account.initialBalance);
+      
+      if(newName && newBalance) {
+        const balanceDiff = parseFloat(newBalance) - account.initialBalance;
+        account.name = newName;
+        account.initialBalance = parseFloat(newBalance);
+        account.balance += balanceDiff;
+        saveData();
+      }
+    }
 
-function deleteAccount(accountId) {
-  if(confirm('Eliminare conto e transazioni?')) {
-    accounts = accounts.filter(a => a.id !== accountId);
-    transactions = transactions.filter(t => t.accountId !== accountId);
-    saveData();
-  }
-}
+    function deleteAccount(accountId) {
+      if(confirm('Eliminare questo conto e tutte le sue transazioni?')) {
+        accounts = accounts.filter(a => a.id !== accountId);
+        transactions = transactions.filter(t => t.accountId !== accountId);
+        saveData();
+      }
+    }
 
-function editTransaction(index) {
-  const oldTransaction = transactions[index];
-  const newDateInput = prompt('Data (gg/mm/aaaa):', formatDate(oldTransaction.date));
-  const isoDate = convertDateDMYToISO(newDateInput);
-  if(!newDateInput || !isoDate) { 
-    alert('Data non valida!');
-    return;
-  }
-  const newType = prompt('Tipo (income/expense):', oldTransaction.type);
-  const newAccountIdInput = prompt('ID Conto:', oldTransaction.accountId);
-  const newAmountInput = prompt('Importo:', oldTransaction.amount);
-  const newCategory = prompt('Categoria:', oldTransaction.category);
-  if(!newType || !newAccountIdInput || !newAmountInput || !newCategory) {
-     alert('Tutti i campi sono obbligatori!');
-     return;
-  }
-  const newAccountId = parseInt(newAccountIdInput);
-  const newAmount = parseFloat(newAmountInput);
-  const newAccount = accounts.find(a => a.id === newAccountId);
-  if(!newAccount) {
-    alert('Conto non valido!');
-    return;
-  }
+    function editTransaction(index) {
+      const oldTransaction = transactions[index];
+      // Richiedo all'utente l'immissione di tutti i campi in maniera obbligatoria.
+      const newDateInput = prompt('Nuova data (gg/mm/aaaa):', formatDate(oldTransaction.date));
+      const isoDate = convertDateDMYToISO(newDateInput);
+      if(!newDateInput || !isoDate) { 
+        alert('Data non valida!');
+        return;
+      }
+      const newType = prompt('Nuovo tipo (income/expense):', oldTransaction.type);
+      const newAccountIdInput = prompt('Nuovo conto (ID):', oldTransaction.accountId);
+      const newAmountInput = prompt('Nuovo importo:', oldTransaction.amount);
+      const newCategory = prompt('Nuova categoria:', oldTransaction.category);
+      if(!newType || !newAccountIdInput || !newAmountInput || !newCategory) {
+         alert('Tutti i campi sono obbligatori!');
+         return;
+      }
+      const newAccountId = parseInt(newAccountIdInput);
+      const newAmount = parseFloat(newAmountInput);
+      const newAccount = accounts.find(a => a.id === newAccountId);
+      if(!newAccount) {
+        alert('Conto non valido!');
+        return;
+      }
 
-  transactions[index] = {
-    date: isoDate,
-    type: newType,
-    accountId: newAccountId,
-    amount: newAmount,
-    category: newCategory
-  };
+      transactions[index] = {
+        date: isoDate,
+        type: newType,
+        accountId: newAccountId,
+        amount: newAmount,
+        category: newCategory
+      };
 
-  recalcAccounts();
-  saveData();
-}
+      recalcAccounts();
+      saveData();
+    }
 
-function deleteTransaction(index) {
-  if(confirm('Eliminare transazione?')) {
-    transactions.splice(index, 1);
-    recalcAccounts();
-    saveData();
-  }
-}
+    function deleteTransaction(index) {
+      if(confirm('Eliminare questa transazione?')) {
+        transactions.splice(index, 1);
+        recalcAccounts();
+        saveData();
+      }
+    }
 
-function applyDateFilter() {
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
-  
-  if(startDate && endDate && new Date(endDate) < new Date(startDate)) {
-    alert("Data fine non valida!");
-    return;
-  }
-  currentFilter.start = startDate;
-  currentFilter.end = endDate;
-  currentFilter.active = Boolean(startDate || endDate);
-  saveData();
-}
+    function applyDateFilter() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      if(startDate && endDate && new Date(endDate) < new Date(startDate)) {
+        alert("La data fine non può essere precedente alla data inizio!");
+        return;
+      }
+      currentFilter.start = startDate;
+      currentFilter.end = endDate;
+      currentFilter.active = Boolean(startDate || endDate);
+      saveData();
+    }
 
-function clearFilter() {
-  currentFilter = { start: null, end: null, active: false };
-  document.getElementById('startDate').value = '';
-  document.getElementById('endDate').value = '';
-  saveData();
-}
+    function clearFilter() {
+      currentFilter = { start: null, end: null, active: false };
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      saveData();
+    }
 
-updateUI();
+    updateUI();
+  </script>
+
+  <!-- Service Worker e Installazione PWA -->
+  <script>
+    // Registrazione del Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/Finanze-personali/sw.js')
+          .then(registration => {
+            console.log('SW registrato con scope:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Registrazione SW fallita:', error);
+          });
+      });
+    }
+
+    // Gestione dell'installazione PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Se l'app non è già in modalità standalone, mostra il pulsante di installazione
+      if (!((window.navigator.standalone === true) || window.matchMedia('(display-mode: standalone)').matches)) {
+        document.getElementById('installBtn').style.display = 'block';
+      }
+    });
+
+    document.getElementById('installBtn').addEventListener('click', () => {
+      if(deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('Utente ha accettato l\'installazione');
+          }
+          deferredPrompt = null;
+        });
+      }
+    });
   </script>
 </body>
 </html>
