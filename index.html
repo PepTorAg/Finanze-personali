@@ -18,8 +18,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/Finanze-personali/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/Finanze-personali/icons/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/Finanze-personali/icons/apple-icon-180x180.png">
+  <!-- Icona per dispositivi con supporto maggiore: aggiunte ulteriori dimensioni -->
   <link rel="apple-touch-icon" sizes="152x152" href="/Finanze-personali/icons/icon-512x512.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/Finanze-personali/icons/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="144x144" href="/Finanze-personali/icons/icon-144x144.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/Finanze-personali/icons/icon-96x96.png">
   <meta name="msapplication-TileImage" content="/Finanze-personali/icons/ms-icon-150x150.png">
   <meta name="msapplication-config" content="/Finanze-personali/icons/browserconfig.xml">
 
@@ -588,10 +591,21 @@
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/Finanze-personali/sw.js')
           .then(registration => {
-            console.log('SW registrato con scope:', registration.scope);
+            console.log('Service Worker registrato con scope:', registration.scope);
+            
+            // Gestione aggiornamenti: se viene trovato un nuovo SW notificare l'utente
+            registration.onupdatefound = () => {
+              const newWorker = registration.installing;
+              newWorker.onstatechange = () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Nuovo aggiornamento disponibile
+                  alert('Nuova versione disponibile! Ricarica la pagina per aggiornare.');
+                }
+              };
+            };
           })
           .catch(error => {
-            console.log('Registrazione SW fallita:', error);
+            console.error('Registrazione Service Worker fallita:', error);
           });
       });
     }
